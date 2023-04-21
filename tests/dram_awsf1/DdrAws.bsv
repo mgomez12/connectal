@@ -39,7 +39,7 @@ import AxiDma::*;
 import ConnectalConfig::*;
 import HostInterface::*;
 import Probe::*;
-import Axi4::*;
+import Axi4New::*;
 
 module mkDdrAws#(Ddr3TestIndication ind)(DdrAws);
 

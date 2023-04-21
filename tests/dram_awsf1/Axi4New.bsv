@@ -7,7 +7,7 @@ import GetPut::*;
 typedef 64 DdrAddrWidth;
 typedef 16 DdrIdWidth;
 typedef 512 DdrBusWidth;
-typedef Axi4MasterBits#(DdrAddrWidth,DdrBusWidth,DdrIdWidth,Empty) Axi4;
+typedef Axi4MasterBitsNoV#(DdrAddrWidth,DdrBusWidth,DdrIdWidth,Empty) Axi4;
 
 interface Ddr3TestRequest;
    method Action startWriteDram(Bit#(16) id, Bit#(64) addr,
@@ -33,7 +33,7 @@ interface DdrAws;
 endinterface
 
 
-module mkAxi4MasterBitsEmpty#(Axi4Master#(addrWidth,dataWidth,tagWidth) m)(Axi4MasterBits#(addrWidth,busDataWidth,busTagWidth,Empty))
+module mkAxi4MasterBitsEmpty#(Axi4Master#(addrWidth,dataWidth,tagWidth) m)(Axi4MasterBitsNoV#(addrWidth,busDataWidth,busTagWidth,Empty))
     provisos (Add#(dataWidth,d__,busDataWidth),
               Div#(dataWidth,32,dataWidthWords),
     	      Add#(tagWidth,t__,busTagWidth),
