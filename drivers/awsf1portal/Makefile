@@ -43,7 +43,7 @@ modules_check:
 	$(Q)$(MAKE) -C $(KROOT) C=2 M=$(PWD) modules
 
 .PHONY: install
-install: pcieportal.ko
+install: pcieportal.ko ../portalmem/portalmem.ko
 	install -d -m755 $(BS_MOD_DIR)
 	install -m644 pcieportal.ko $(BS_MOD_DIR)
 	install -m644 ../portalmem/portalmem.ko $(BS_MOD_DIR)

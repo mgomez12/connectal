@@ -24,6 +24,7 @@ include Makefile.version
 export UDEV_RULES_DIR=/etc/udev/rules.d
 UDEV_RULES=$(shell ls etc/udev/rules.d)
 MODULES_LOAD_D_DIR=/etc/modules-load.d
+PORTALTYPE=?pcie
 
 all: pciedrivers scripts/syntax/parsetab.py
 	echo version "$(VERSION)"
@@ -48,7 +49,7 @@ install: $(INSTALL_SHARED)
 	    done; \
 	fi
 	echo 'Installing from' $(CURDIR)
-	(cd drivers/pcieportal; CONNECTALDIR=$(CURDIR) make install)
+	(cd drivers/$(PORTALTYPE)portal; CONNECTALDIR=$(CURDIR) make install)
 	install -m644 etc/modules-load.d/connectal.conf $(DESTDIR)/etc/modules-load.d
 	make -C pcie install
 	install -d -m755 $(DESTDIR)$(UDEV_RULES_DIR)

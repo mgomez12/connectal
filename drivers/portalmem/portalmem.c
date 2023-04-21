@@ -37,6 +37,8 @@
 #include "drivers/portalmem/portalmem.h"
 #include "driverversion.h"
 
+MODULE_IMPORT_NS(DMA_BUF);
+
 #ifdef DEBUG // was KERN_DEBUG
 #define driver_devel(format, ...)               \
         do {                                    \
@@ -239,16 +241,6 @@ static void pa_dma_buf_release(struct dma_buf *dmabuf)
         pa_buffer_free(buffer);
 }
 
-static void *pa_dma_buf_kmap(struct dma_buf *dmabuf, unsigned long offset)
-{
-        struct pa_buffer *buffer = dmabuf->priv;
-        return buffer->vaddr + offset * PAGE_SIZE;
-}
-
-static void pa_dma_buf_kunmap(struct dma_buf *dmabuf, unsigned long offset,
-                              void *ptr)
-{
-}
 
 static int pa_dma_buf_begin_cpu_access(struct dma_buf *dmabuf,
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(4,6,0))
@@ -320,20 +312,21 @@ pa_dma_buf_end_cpu_access(struct dma_buf *dmabuf,
 #endif
 }
 
-static void *pa_dma_buf_vmap(struct dma_buf *dmabuf)
+static int pa_dma_buf_vmap(struct dma_buf *dmabuf, struct dma_buf_map *map)
 {
         struct pa_buffer *buffer = dmabuf->priv;
-        pa_dma_buf_begin_cpu_access(dmabuf,
+        int ret = pa_dma_buf_begin_cpu_access(dmabuf,
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(4,6,0))
                                     0, 0,
 #endif
                                     0);
-        return buffer->vaddr;
+	if (ret == 0) dma_buf_map_set_vaddr(map, buffer->vaddr);
+	return ret;
 }
 
-static void pa_dma_buf_vunmap(struct dma_buf *dmabuf, void *vaddr)
+static void pa_dma_buf_vunmap(struct dma_buf *dmabuf, struct dma_buf_map *map)
 {
-        printk("%s: dmabuf %p vaddr %p\n", __FUNCTION__, dmabuf, vaddr);
+        printk("%s: dmabuf %p vaddr %p\n", __FUNCTION__, dmabuf, map->vaddr);
 }
 
 
@@ -355,8 +348,8 @@ static struct dma_buf_ops dma_buf_ops = {
         .unmap_atomic     = pa_dma_buf_kunmap,
 #endif
 #if !(defined(RHEL_MAJOR) && RHEL_MAJOR >= 8)
-        .map              = pa_dma_buf_kmap,
-        .unmap            = pa_dma_buf_kunmap,
+        //.map              = pa_dma_buf_kmap,
+        //.unmap            = pa_dma_buf_kunmap,
 #endif
 #endif
         .vmap             = pa_dma_buf_vmap,
